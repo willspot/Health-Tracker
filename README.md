@@ -7,7 +7,7 @@ Health Tracker is a modern, fullstack web application that empowers users to mon
 
 ## Setup Instruction
 
-1. Clone the Repository
+1. Clone the Repository:
 
 ```bash
 git clone https://github.com/willspot/Health-Tracker.git
