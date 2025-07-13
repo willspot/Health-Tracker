@@ -34,7 +34,7 @@ php artisan migrate
 ```
 Start the backend server:
 ```bash
-php artisan serve --host=localhost --port=8000
+php -S localhost:8000 -t public
 ```
 OR
 ```bash
