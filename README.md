@@ -7,6 +7,8 @@ Health Tracker is a modern, fullstack web application that empowers users to mon
 
 ## Setup Instruction
 
+Using XAMPP, navigate to the xampp/htdocs folder then:
+
 1. Clone the Repository:
 
 ```bash
