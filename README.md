@@ -34,7 +34,7 @@ php artisan migrate
 ```
 Start the backend server:
 ```bash
-php artisan serve
+php artisan serve --host=localhost --port=8000
 ```
 The backend API will be available at http://localhost:8000
 
