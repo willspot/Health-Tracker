@@ -36,6 +36,10 @@ Start the backend server:
 ```bash
 php artisan serve --host=localhost --port=8000
 ```
+OR
+```bash
+php artisan serve
+```
 The backend API will be available at http://localhost:8000
 
 3. Frontend Setup (Next.js/React)
