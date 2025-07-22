@@ -2,7 +2,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function Nav() {
+interface NavProps {
+  onExport?: () => void;
+}
+
+export default function Nav({ onExport }: NavProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -38,6 +42,17 @@ export default function Nav() {
             onClick={() => router.push("/profile")}
           >
             <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="8" r="4"/><path d="M4 20v-1a4 4 0 014-4h8a4 4 0 014 4v1"/></svg>
+          </button>
+          {/* Export */}
+          <button
+            className="hover:text-blue-700 transition-colors"
+            aria-label="Export"
+            onClick={onExport}
+          >
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path d="M12 4v12m0 0l-4-4m4 4l4-4" />
+              <rect x="4" y="20" width="16" height="2" rx="1" />
+            </svg>
           </button>
           {/* Logout */}
           <button 

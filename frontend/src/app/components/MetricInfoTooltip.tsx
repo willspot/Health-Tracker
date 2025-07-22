@@ -23,7 +23,7 @@ const MetricInfoTooltip: React.FC<MetricInfoTooltipProps> = ({ value, unit, clas
         <circle cx="12" cy="12" r="10" strokeWidth="2" />
         <text x="12" y="16" textAnchor="middle" fontSize="12" fill="#3b82f6">i</text>
       </svg>
-      <div className="absolute right-0 z-50 top-7 hidden group-hover:block bg-white border border-gray-300 shadow-lg rounded-lg p-3 min-w-[320px] max-w-[400px] text-[10px] text-gray-700 whitespace-normal">
+      <div className="absolute right-0 z-50 bottom-full mb-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg rounded-lg p-3 min-w-[320px] max-w-[400px] text-[10px] text-gray-700 whitespace-normal">
         {children}
       </div>
     </span>

@@ -12,6 +12,8 @@ import FoodTooltipTable from "./components/FoodTooltipTable";
 import BloodStatusTooltipTable from "./components/BloodStatusTooltipTable";
 import TemperatureTooltipTable from "./components/TemperatureTooltipTable";
 import HeartRateTooltipTable from "./components/HeartRateTooltipTable";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const unitMap = {
   heart_rate: 'bpm',
@@ -163,6 +165,131 @@ export default function Home() {
     return { status: "Unknown", description: "No data available", color: "#6b7280" };
   }
 
+  const handleExport = async () => {
+    const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
+    let y = 40;
+    doc.setFontSize(22);
+    doc.setTextColor('#2563eb');
+    doc.text("Health Tracker Report", 40, y);
+    y += 30;
+    doc.setFontSize(14);
+    doc.setTextColor('#222');
+    if (user) {
+      doc.text(`Name: ${user.name}`, 40, y);
+      y += 20;
+      doc.text(`Email: ${user.email}`, 40, y);
+      y += 30;
+    }
+    doc.setFontSize(16);
+    doc.setTextColor('#2563eb');
+    doc.text("Metrics Summary", 40, y);
+    y += 20;
+    doc.setFontSize(12);
+    doc.setTextColor('#222');
+    if (metrics) {
+      const metricList = [
+        { label: 'Weight', value: metrics.weight?.at(-1), unit: 'kg' },
+        { label: 'Food', value: metrics.food?.at(-1), unit: 'Kcal' },
+        { label: 'Steps', value: metrics.steps?.at(-1), unit: 'steps' },
+        { label: 'Heart Rate', value: metrics.heart_rate?.at(-1), unit: 'bpm' },
+        { label: 'Temperature', value: metrics.temperature?.at(-1), unit: '°C' },
+        { label: 'Blood Pressure', value: metrics.blood_pressure?.systolic?.at(-1) && metrics.blood_pressure?.diastolic?.at(-1) ? `${metrics.blood_pressure.systolic.at(-1)}/${metrics.blood_pressure.diastolic.at(-1)}` : '--/--', unit: 'mmHg' },
+      ];
+      metricList.forEach(m => {
+        doc.text(`${m.label}: ${m.value ?? '--'} ${m.unit}`, 60, y);
+        y += 18;
+      });
+      y += 10;
+      // Goals
+      if (goals.calories || goals.steps) {
+        doc.setFontSize(13);
+        doc.setTextColor('#2563eb');
+        doc.text("Goals", 40, y);
+        y += 18;
+        doc.setFontSize(12);
+        doc.setTextColor('#222');
+        if (goals.calories) {
+          doc.text(`Calories: ${goals.calories} Kcal`, 60, y);
+          y += 16;
+        }
+        if (goals.steps) {
+          doc.text(`Steps: ${goals.steps}`, 60, y);
+          y += 16;
+        }
+      }
+    }
+    // --- Metrics Summary Box ---
+    y += 20;
+    const boxX = 40;
+    const boxW = 500;
+    let boxH = 60; // will be recalculated
+    const rowH = 28;
+    const metricsToShow = [
+      { label: 'Weight', value: metrics?.weight?.at(-1) ?? '--', unit: 'kg' },
+      { label: 'Food', value: metrics?.food?.at(-1) ?? '--', unit: 'Kcal' },
+      { label: 'Steps', value: metrics?.steps?.at(-1) ?? '--', unit: 'steps' },
+      { label: 'Heart Rate', value: metrics?.heart_rate?.at(-1) ?? '--', unit: 'bpm' },
+      { label: 'Temperature', value: metrics?.temperature?.at(-1) ?? '--', unit: '°C' },
+      { label: 'Blood Pressure', value: (metrics?.blood_pressure?.systolic?.at(-1) && metrics?.blood_pressure?.diastolic?.at(-1)) ? `${metrics.blood_pressure.systolic.at(-1)}/${metrics.blood_pressure.diastolic.at(-1)}` : '--/--', unit: 'mmHg' },
+    ];
+    boxH = 50 + metricsToShow.length * rowH + 20;
+    doc.setDrawColor('#2563eb');
+    doc.setFillColor(234, 241, 251);
+    doc.roundedRect(boxX, y, boxW, boxH, 12, 12, 'F');
+    // Section title
+    doc.setFontSize(16);
+    doc.setTextColor('#2563eb');
+    doc.setFont('helvetica', 'bold');
+    doc.text('Metrics Summary', boxX + 20, y + 32);
+    // Divider
+    doc.setDrawColor('#2563eb');
+    doc.setLineWidth(1);
+    doc.line(boxX + 20, y + 38, boxX + boxW - 20, y + 38);
+    // Table header
+    let rowY = y + 54;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    // Metrics rows
+    metricsToShow.forEach((m, i) => {
+      // row background
+      if (i % 2 === 0) {
+        doc.setFillColor(255, 255, 255);
+        doc.rect(boxX + 10, rowY - 14, boxW - 20, rowH, 'F');
+      }
+      // Label
+      doc.setTextColor('#444');
+      doc.text(m.label, boxX + 30, rowY);
+      // Value
+      doc.setTextColor('#2563eb');
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${m.value} ${m.unit}`, boxX + boxW - 120, rowY, { align: 'right' });
+      doc.setFont('helvetica', 'normal');
+      rowY += rowH;
+    });
+    y += boxH;
+   
+    y += 20;
+    doc.setDrawColor('#2563eb');
+    doc.setFillColor(234, 241, 251);
+    doc.roundedRect(40, y, 500, 60, 8, 8, 'F');
+    doc.setFontSize(13);
+    doc.setTextColor('#2563eb');
+    doc.text("Summary:", 60, y + 25);
+    doc.setFontSize(12);
+    doc.setTextColor('#222');
+    doc.text("This report contains your latest health metrics and goals. Stay healthy!", 60, y + 45);
+    // Developer credit and GitHub link
+    let creditY = y + 120;
+    doc.setFontSize(11);
+    doc.setTextColor('#888');
+    doc.text("Developed by: Alabi-Williams Samuel (Willspot)", 40, creditY);
+    creditY += 16;
+    doc.setTextColor('#2563eb');
+    doc.textWithLink("Github: https://github.com/willspot", 40, creditY, { url: "https://github.com/willspot" });
+    
+    doc.save('health-tracker-report.pdf');
+  };
+
   // Show loading while checking user authentication
   if (isLoading) {
     return (
@@ -176,7 +303,7 @@ export default function Home() {
 
   return (
     <>
-      <Nav />
+      <Nav onExport={handleExport} />
       {popup.type && (
         <div className={`fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded shadow-lg z-50
           ${popup.type === "success" ? "bg-green-500 text-white" : "bg-red-500 text-white"}`}>
@@ -607,19 +734,80 @@ export default function Home() {
               </div>
             </div>
           </div>
-          {/* Sleep Time */}
-          <div className="rounded-2xl bg-white/60 border border-gray-200 p-4 flex flex-col gap-2 w-full">
+        {/* Summary with tooltips for */}
+        <div className="rounded-2xl bg-white/60 border border-gray-200 p-3 flex flex-col gap-4 min-h-[90px] mt-2">
+          {/* tooltip for weight, food */}
+          {/* <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-gray-700"></span>
-              <span className="text-xs text-gray-400"></span>
+              <span className="text-sm font-medium text-gray-700">Weight</span>
+              <MetricInfoTooltip
+                value={metrics?.weight?.length ? metrics.weight[metrics.weight.length - 1] : "--"}
+                unit="kg"
+                className="mr-4"
+              >
+                <WeightTooltipTable />
+              </MetricInfoTooltip>
             </div>
-            <div className="flex items-center gap-2 w-full">
-              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-2 bg-blue-900 rounded-full" style={{ width: '60%' }}></div>
-              </div>
-              <span className="bg-blue-900 text-white text-xs font-semibold rounded-full px-2 py-1">Summary</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Food</span>
+              <MetricInfoTooltip
+                value={metrics?.food?.length ? metrics.food[metrics.food.length - 1] : "--"}
+                unit="Kcal"
+                className="mr-4"
+              >
+                <FoodTooltipTable />
+              </MetricInfoTooltip>
             </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Steps</span>
+              <span className="text-xs text-gray-400">
+                {metrics?.steps?.length
+                  ? `${metrics.steps[metrics.steps.length - 1]} steps`
+                  : "-- steps"}
+              </span>
+            </div>
+          </div> */}
+          {/* tooltip for blood status, temp, heart rate */}
+          {/* <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Blood Status</span>
+              <MetricInfoTooltip
+                value={metrics?.blood_pressure?.systolic?.length && metrics?.blood_pressure?.diastolic?.length
+                  ? `${metrics.blood_pressure.systolic[metrics.blood_pressure.systolic.length - 1]}/${metrics.blood_pressure.diastolic[metrics.blood_pressure.diastolic.length - 1]}`
+                  : "--/--"}
+                unit="mmHg"
+                className="mr-4"
+              >
+                <BloodStatusTooltipTable />
+              </MetricInfoTooltip>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Temperature</span>
+              <MetricInfoTooltip
+                value={metrics?.temperature?.length ? metrics.temperature[metrics.temperature.length - 1] : "--"}
+                unit="°C"
+                className="mr-4"
+              >
+                <TemperatureTooltipTable />
+              </MetricInfoTooltip>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">Heart Rate</span>
+              <MetricInfoTooltip
+                value={metrics?.heart_rate?.length ? metrics.heart_rate[metrics.heart_rate.length - 1] : "--"}
+                unit="bpm"
+              >
+                <HeartRateTooltipTable />
+              </MetricInfoTooltip>
+            </div>
+          </div> */}
+          <div className="flex items-center gap-4 w-full mt-2">
+            <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-3 bg-blue-900 rounded-full" style={{ width: '60%' }}></div>
+            </div>
+            <span className="bg-blue-900 text-white text-xs font-semibold rounded-full px-4 py-1">Summary</span>
           </div>
+        </div>
         </div>
 
 
