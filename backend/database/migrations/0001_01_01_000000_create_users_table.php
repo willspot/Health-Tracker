@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+
 
 return new class extends Migration
 {
@@ -20,6 +22,20 @@ return new class extends Migration
         //     $table->rememberToken();
         //     $table->timestamps();
         // });
+
+        Schema::create('users', function (Blueprint $table) {
+            $table->increments('id'); // int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY
+            $table->string('name', 100);
+            $table->string('email', 100)->unique();
+            $table->string('password', 255);
+            $table->integer('role_id')->unsigned()->nullable();
+
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+
+            $table->foreign('role_id')->references('id')->on('roles');
+            $table->index('role_id');
+        });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
