@@ -146,16 +146,16 @@ export default function Home() {
   //   return { sub: "No change", color: "#6b7280" };
   // }
 
-  function getWeightSub(weightArr: (number | null | undefined)[]) {
+  function getWeightSub(weightArr: (number | string)[]) {
     if (!weightArr || weightArr.length === 0)
       return { sub: "No data", color: "#6b7280" };
     if (weightArr.length === 1)
       return { sub: "No previous data", color: "#6b7280" };
 
-    const last = weightArr[weightArr.length - 1];
-    const prev = weightArr[weightArr.length - 2];
+    const last = Number(weightArr[weightArr.length - 1]);
+    const prev = Number(weightArr[weightArr.length - 2]);
 
-    if (typeof last !== "number" || typeof prev !== "number")
+    if (isNaN(last) || isNaN(prev))
       return { sub: "Invalid data", color: "#6b7280" };
 
     const diff = last - prev;
@@ -445,12 +445,13 @@ export default function Home() {
                       : "--"}
                   </span> */}
                   <span className="text-2xl font-bold text-blue-700">
-                    {metrics?.weight?.length &&
-                    typeof metrics.weight[metrics.weight.length - 1] ===
-                      "number"
-                      ? metrics.weight[metrics.weight.length - 1].toFixed(1)
+                    {metrics?.weight?.length
+                      ? Number(
+                          metrics.weight[metrics.weight.length - 1]
+                        ).toFixed(1)
                       : "--"}
                   </span>
+
                   <span className="text-xs text-gray-400 mb-1">kg</span>
                 </div>
               </div>
@@ -1073,10 +1074,10 @@ export default function Home() {
                         : "--"}
                     </span> */}
                     <span className="text-2xl font-bold text-blue-700">
-                      {metrics?.weight?.length &&
-                      typeof metrics.weight[metrics.weight.length - 1] ===
-                        "number"
-                        ? metrics.weight[metrics.weight.length - 1].toFixed(1)
+                      {metrics?.weight?.length
+                        ? Number(
+                            metrics.weight[metrics.weight.length - 1]
+                          ).toFixed(1)
                         : "--"}
                     </span>
                     <span className="text-xs text-gray-600 mb-1">kg</span>
