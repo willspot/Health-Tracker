@@ -132,13 +132,33 @@ export default function Home() {
     }
   };
 
-  function getWeightSub(weightArr: number[]) {
+  // function getWeightSub(weightArr: number[]) {
+  //   if (!weightArr || weightArr.length === 0)
+  //     return { sub: "No data", color: "#6b7280" };
+  //   if (weightArr.length === 1)
+  //     return { sub: "No previous data", color: "#6b7280" };
+  //   const diff =
+  //     weightArr[weightArr.length - 1] - weightArr[weightArr.length - 2];
+  //   if (diff < 0)
+  //     return { sub: `Lost ${Math.abs(diff).toFixed(1)} kg`, color: "#ef4444" };
+  //   if (diff > 0)
+  //     return { sub: `Gained ${diff.toFixed(1)} kg`, color: "#10b981" };
+  //   return { sub: "No change", color: "#6b7280" };
+  // }
+
+  function getWeightSub(weightArr: (number | null | undefined)[]) {
     if (!weightArr || weightArr.length === 0)
       return { sub: "No data", color: "#6b7280" };
     if (weightArr.length === 1)
       return { sub: "No previous data", color: "#6b7280" };
-    const diff =
-      weightArr[weightArr.length - 1] - weightArr[weightArr.length - 2];
+
+    const last = weightArr[weightArr.length - 1];
+    const prev = weightArr[weightArr.length - 2];
+
+    if (typeof last !== "number" || typeof prev !== "number")
+      return { sub: "Invalid data", color: "#6b7280" };
+
+    const diff = last - prev;
     if (diff < 0)
       return { sub: `Lost ${Math.abs(diff).toFixed(1)} kg`, color: "#ef4444" };
     if (diff > 0)
@@ -419,8 +439,15 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="mt-auto flex items-end gap-1">
-                  <span className="text-2xl font-bold text-blue-700">
+                  {/* <span className="text-2xl font-bold text-blue-700">
                     {metrics?.weight?.length
+                      ? metrics.weight[metrics.weight.length - 1].toFixed(1)
+                      : "--"}
+                  </span> */}
+                  <span className="text-2xl font-bold text-blue-700">
+                    {metrics?.weight?.length &&
+                    typeof metrics.weight[metrics.weight.length - 1] ===
+                      "number"
                       ? metrics.weight[metrics.weight.length - 1].toFixed(1)
                       : "--"}
                   </span>
@@ -1040,8 +1067,15 @@ export default function Home() {
                   </div>
 
                   <div className="mt-auto flex items-end gap-1">
-                    <span className="text-2xl font-bold text-blue-700">
+                    {/* <span className="text-2xl font-bold text-blue-700">
                       {metrics?.weight?.length
+                        ? metrics.weight[metrics.weight.length - 1].toFixed(1)
+                        : "--"}
+                    </span> */}
+                    <span className="text-2xl font-bold text-blue-700">
+                      {metrics?.weight?.length &&
+                      typeof metrics.weight[metrics.weight.length - 1] ===
+                        "number"
                         ? metrics.weight[metrics.weight.length - 1].toFixed(1)
                         : "--"}
                     </span>
