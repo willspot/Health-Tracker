@@ -9,6 +9,8 @@ export default function SignUp() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -25,7 +27,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/api/signup", {
+      const res = await fetch(`${API_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),

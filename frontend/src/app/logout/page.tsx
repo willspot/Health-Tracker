@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function LogoutPage() {
   const router = useRouter();
 
@@ -10,10 +12,10 @@ export default function LogoutPage() {
     localStorage.removeItem("token");
 
     // Optionally, call backend logout endpoint
-    fetch("http://localhost:8000/api/logout", {
+    fetch(`${API_URL}/logout`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     }).catch(() => {});
 
