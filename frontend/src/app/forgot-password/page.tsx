@@ -1,23 +1,27 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ForgotPassword() {
-  const searchParams = useSearchParams();
-  const emailFromQuery = searchParams.get("email") || "";
+  const router = useRouter();
 
-  const [email, setEmail] = useState(emailFromQuery);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Get email from query params on client-side
   useEffect(() => {
-    if (emailFromQuery) setEmail(emailFromQuery);
-  }, [emailFromQuery]);
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const emailFromQuery = params.get("email");
+      if (emailFromQuery) setEmail(emailFromQuery);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +53,7 @@ export default function ForgotPassword() {
       if (response.ok) {
         setSuccess("Password updated successfully. Redirecting to login...");
         setTimeout(() => {
-          window.location.href = "/login";
+          router.push("/login");
         }, 2000);
       } else {
         setError(data.message || "Failed to reset password");
