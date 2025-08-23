@@ -32,6 +32,21 @@ class UserController extends Controller
         return response()->json(['status' => 'success']);
     }
 
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        return response()->json(['message' => 'Password updated successfully']);
+    }
+
+
     public function changePassword(Request $request)
     {
         $user = Auth::user();

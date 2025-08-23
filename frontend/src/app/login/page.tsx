@@ -105,6 +105,14 @@ export default function SignIn() {
               required
             />
           </div>
+          <div className="text-right w-full">
+            <a
+              href="/confirm-email"
+              className="text-blue-600 font-semibold hover:underline text-base"
+            >
+              Forgot Password?
+            </a>
+          </div>
           <button
             type="submit"
             className="w-full mt-2 py-3 rounded-lg bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition"

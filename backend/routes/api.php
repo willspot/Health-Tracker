@@ -57,6 +57,22 @@ Route::post('/signup', function(Request $request) {
 });
 
 
+Route::post('/check-email', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email',
+    ]);
+
+    $exists = User::where('email', $request->email)->exists();
+
+    return response()->json(['exists' => $exists]);
+});
+
+
+
+Route::post('/reset-password', [UserController::class, 'resetPassword']);
+
+
+
 // Protected routes
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', function (Request $request) {
